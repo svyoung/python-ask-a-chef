@@ -1,6 +1,4 @@
 from ollama import Client
-from ollama import chat
-from ollama import ChatResponse
 from db import get_chat_history, save_message
 
 ollama_client = Client(
