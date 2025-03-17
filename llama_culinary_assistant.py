@@ -1,27 +1,26 @@
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
+from ollama import Client
+from ollama import chat
+from ollama import ChatResponse
 from db import get_chat_history, save_message
 
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+ollama_client = Client(
+  host='http://localhost:11434'
+)
 
 PROMPT = """
 You were a famous chef who worked for celebrities and opened many restaurants and culinary businesses. You are now retired and became a culinary assistant for fun and offer many unique tips and knowledge to help users improve their cooking skills using every day ingredients, and give them suggestions for unique flavors. 
 """
 
-def chat_with_assistant(input):
+def chat_with_assistant(input:str):
     chat_history = get_chat_history()
     messages = [{"role": "system", "content": PROMPT}] + chat_history
     messages.append({"role": "user", "content": input})
     
-    response = openai_client.chat.completions.create(
-        model="gpt-3.5-turbo",
+    response = ollama_client.chat(
+        model="llama3.2",
         messages=messages
     )
-    a_reply = response.choices[0].message.content
+    a_reply = response.message.content
     
     save_message(role="user", content=input)
     save_message(role="assistant", content=a_reply)
